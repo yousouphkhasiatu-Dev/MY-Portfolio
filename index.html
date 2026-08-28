@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Portfolio — Développeuse Web</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg: #0b0d12;
+  --surface: #12151c;
+  --surface-2: #191d26;
+  --border: #262b36;
+  --text: #e7e9ee;
+  --text-dim: #8b93a3;
+  --accent: #5fd3bc;
+  --accent-2: #f2c94c;
+  --radius: 8px;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter', sans-serif;
+  line-height:1.6;
+}
+
+::selection{
+  background:var(--accent);
+  color:#0b0d12;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+/* ==============================
+   FENÊTRE STYLE ÉDITEUR
+================================ */
+
+.editor{
+  max-width:1100px;
+  margin:32px auto;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 40px 80px -40px rgba(0,0,0,0.6);
+}
+
+.titlebar{
+  background:var(--surface-2);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+}
+
+.dots{
+  display:flex;
+  gap:7px;
+}
+
+.dot{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+}
+
+.dot.red{
+  background:#ff5f57;
+}
+
+.dot.yellow{
+  background:#febc2e;
+}
+
+.dot.green{
+  background:#28c840;
+}
+
+.tab{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  color:var(--text-dim);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-bottom:none;
+  padding:6px 14px;
+  border-radius:6px 6px 0 0;
+}
+
+.tab .dirty{
+  color:var(--accent-2);
+  margin-left:6px;
+}
+
+/* ==============================
+   STRUCTURE
+================================ */
+
+.body-shell{
+  display:grid;
+  grid-template-columns:190px 1fr;
+}
+
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:18px 10px;
+}
+
+.sidebar-title{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:.12em;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  padding:0 8px 10px;
+}
+
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  color:var(--text-dim);
+  padding:7px 8px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.nav-item:hover,
+.nav-item.active{
+  background:var(--surface-2);
+  color:var(--text);
+}
+
+.nav-item .ext{
+  color:var(--accent);
+}
+
+.content{
+  background:var(--bg);
+}
+
+.section{
+  display:grid;
+  grid-template-columns:52px 1fr;
+  padding:64px 32px;
+  border-bottom:1px solid var(--border);
+}
+
+.section:last-child{
+  border-bottom:none;
+}
+
+.gutter{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:#3a4150;
+  text-align:right;
+  padding-right:16px;
+  user-select:none;
+  line-height:2.1;
+}
+
+.eyebrow{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--accent);
+  margin-bottom:10px;
+}
+
+h1{
+  font-family:'JetBrains Mono', monospace;
+  font-weight:800;
+  font-size:clamp(28px,5vw,46px);
+  line-height:1.25;
+}
+
+h1 .kw{
+  color:#ff7b72;
+}
+
+h1 .fn{
+  color:#d2a8ff;
+}
+
+h1 .str{
+  color:var(--accent-2);
+}
+
+h1 .punct{
+  color:var(--text-dim);
+}
+
+h2{
+  font-family:'JetBrains Mono', monospace;
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:24px;
+}
+
+h2 .num{
+  color:var(--text-dim);
+  font-weight:400;
+}
+
+p{
+  color:var(--text-dim);
+  max-width:60ch;
+}
+
+.cursor{
+  display:inline-block;
+  width:9px;
+  height:1.1em;
+  background:var(--accent);
+  margin-left:4px;
+  vertical-align:text-bottom;
+  animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+  50%{
+    opacity:0;
+  }
+}
+
+/* ==============================
+   BOUTONS
+================================ */
+
+.btn-row{
+  margin-top:28px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  padding:11px 18px;
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+
+.btn.primary{
+  background:var(--accent);
+  color:#0b0d12;
+  border-color:var(--accent);
+  font-weight:700;
+}
+
+.btn.primary:hover{
+  opacity:.88;
+}
+
+.btn.ghost{
+  color:var(--text);
+}
+
+.btn.ghost:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+
+/* ==============================
+   COMPÉTENCES
+================================ */
+
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.tag{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:8px 12px;
+  border-radius:6px;
+  color:var(--text-dim);
+}
+
+.tag b{
+  color:var(--text);
+  font-weight:600;
+}
+
+/* ==============================
+   PROJETS
+================================ */
+
+.projects-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
+  gap:16px;
+}
+
+.project-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  min-height:180px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:.15s;
+}
+
+.project-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+}
+
+.project-card h3{
+  font-family:'JetBrains Mono', monospace;
+  font-size:15px;
+  color:var(--text);
+  margin-bottom:10px;
+}
+
+.project-card p{
+  font-size:13px;
+}
+
+.project-tech{
+  font-family:'JetBrains Mono', monospace;
+  color:var(--accent);
+  font-size:11px;
+  margin-top:15px;
+}
+
+/* ==============================
+   CONTACT
+================================ */
+
+.terminal{
+  background:#080a0e;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:13.5px;
+  max-width:520px;
+}
+
+.terminal .line{
+  margin-bottom:6px;
+}
+
+.terminal .prompt{
+  color:var(--accent);
+}
+
+.terminal a{
+  color:var(--accent-2);
+}
+
+.terminal a:hover{
+  text-decoration:underline;
+}
+
+/* ==============================
+   FOOTER
+================================ */
+
+footer{
+  text-align:center;
+  padding:22px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11.5px;
+  color:var(--text-dim);
+}
+
+/* ==============================
+   RESPONSIVE
+================================ */
+
+@media(max-width:720px){
+
+  .body-shell{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    display:flex;
+    overflow-x:auto;
+    border-right:none;
+    border-bottom:1px solid var(--border);
+  }
+
+  .sidebar-title{
+    display:none;
+  }
+
+  .nav-item{
+    white-space:nowrap;
+  }
+
+  .section{
+    grid-template-columns:1fr;
+    padding:44px 22px;
+  }
+
+  .gutter{
+    display:none;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="editor">
+
+  <!-- BARRE DU HAUT -->
+
+  <div class="titlebar">
+
+    <div class="dots">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+    </div>
+
+    <div class="tab">
+      portfolio.html
+      <span class="dirty">●</span>
+    </div>
+
+  </div>
+
+
+  <div class="body-shell">
+
+
+    <!-- SIDEBAR -->
+
+    <nav class="sidebar">
+
+      <div class="sidebar-title">
+        Explorateur
+      </div>
+
+      <a href="#accueil" class="nav-item active">
+        <span class="ext">&lt;/&gt;</span>
+        accueil
+      </a>
+
+      <a href="#a-propos" class="nav-item">
+        <span class="ext">#</span>
+        a-propos
+      </a>
+
+      <a href="#competences" class="nav-item">
+        <span class="ext">{}</span>
+        competences
+      </a>
+
+      <a href="#projets" class="nav-item">
+        <span class="ext">▤</span>
+        projets
+      </a>
+
+      <a href="#contact" class="nav-item">
+        <span class="ext">@</span>
+        contact
+      </a>
+
+    </nav>
+
+
+    <!-- CONTENU PRINCIPAL -->
+
+    <main class="content">
+
+
+      <!-- ACCUEIL -->
+
+      <section class="section" id="accueil">
+
+        <div class="gutter">
+          1<br>2<br>3<br>4
+        </div>
+
+        <div>
+
+          <div class="eyebrow">
+            // portfolio.init()
+          </div>
+
+          <h1>
+
+            <span class="kw">const</span> dev
+            <span class="punct">=</span>
+            <span class="punct">{</span><br>
+
+            &nbsp;&nbsp;profil
+            <span class="punct">:</span>
+            <span class="str">"Développeuse Web"</span>
+            <span class="punct">,</span><br>
+
+            &nbsp;&nbsp;formation
+            <span class="punct">:</span>
+            <span class="str">"Licence 3 — Développement Web"</span><br>
+
+            <span class="punct">}</span>
+            <span class="cursor"></span>
+
+          </h1>
+
+          <p style="margin-top:20px;">
+
+            Étudiante en développement web, je développe progressivement
+            mes compétences en conception d'interfaces et en programmation.
+            À travers mes projets, j'explore le développement front-end,
+            le design et la création d'expériences web simples et modernes.
+
+          </p>
+
+          <div class="btn-row">
+
+            <a href="#projets" class="btn primary">
+              Voir mes projets
+            </a>
+
+            <a href="#contact" class="btn ghost">
+              Me contacter
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- À PROPOS -->
+
+      <section class="section" id="a-propos">
+
+        <div class="gutter">
+          5<br>6
+        </div>
+
+        <div>
+
+          <h2>
+            <span class="num">01 /</span>
+            À propos
+          </h2>
+
+          <p>
+
+            Je suis étudiante en Licence 3 dans le domaine du développement web.
+            Je m'intéresse particulièrement à la création de sites et d'interfaces
+            modernes, accessibles et agréables à utiliser. Mon parcours me permet
+            de développer mes compétences en HTML, CSS et JavaScript tout en
+            explorant également le design et les outils numériques.
+
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- COMPÉTENCES -->
+
+      <section class="section" id="competences">
+
+        <div class="gutter">
+          7<br>8
+        </div>
+
+        <div>
+
+          <h2>
+            <span class="num">02 /</span>
+            Compétences
+          </h2>
+
+          <div class="tags">
+
+            <div class="tag">
+              <b>HTML5</b>
+            </div>
+
+            <div class="tag">
+              <b>CSS3</b>
+            </div>
+
+            <div class="tag">
+              <b>JavaScript</b>
+            </div>
+
+            <div class="tag">
+              Git
+            </div>
+
+            <div class="tag">
+              GitHub
+            </div>
+
+            <div class="tag">
+              VS Code
+            </div>
+
+            <div class="tag">
+              Canva
+            </div>
+
+            <div class="tag">
+              Infographie
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PROJETS -->
+
+      <section class="section" id="projets">
+
+        <div class="gutter">
+          9<br>10
+        </div>
+
+        <div>
+
+          <h2>
+            <span class="num">03 /</span>
+            Projets
+          </h2>
+
+          <p style="margin-bottom:20px;">
+
+            Une sélection de mes premiers projets et travaux réalisés dans
+            le cadre de mon apprentissage du développement web et du design.
+
+          </p>
+
+
+          <div class="projects-grid">
+
+
+            <div class="project-card">
+
+              <div>
+
+                <h3>
+                  Mon Portfolio
+                </h3>
+
+                <p>
+
+                  Conception et développement de mon portfolio personnel
+                  afin de présenter mes compétences, mes projets et mon parcours.
+
+                </p>
+
+              </div>
+
+              <div class="project-tech">
+                HTML • CSS • JavaScript
+              </div>
+
+            </div>
+
+
+            <div class="project-card">
+
+              <div>
+
+                <h3>
+                  Interfaces Web
+                </h3>
+
+                <p>
+
+                  Création de différentes maquettes et interfaces web
+                  dans le cadre de mes exercices et projets d'apprentissage.
+
+                </p>
+
+              </div>
+
+              <div class="project-tech">
+                HTML • CSS • Design
+              </div>
+
+            </div>
+
+
+            <div class="project-card">
+
+              <div>
+
+                <h3>
+                  Projets en apprentissage
+                </h3>
+
+                <p>
+
+                  Réalisation progressive de petits projets pratiques
+                  pour renforcer mes compétences en développement web
+                  et en programmation.
+
+                </p>
+
+              </div>
+
+              <div class="project-tech">
+                JavaScript • Web
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- CONTACT -->
+
+      <section class="section" id="contact">
+
+        <div class="gutter">
+          11<br>12
+        </div>
+
+        <div>
+
+          <h2>
+            <span class="num">04 /</span>
+            Contact
+          </h2>
+
+
+          <div class="terminal">
+
+            <div class="line">
+              <span class="prompt">$</span>
+              cat contact.txt
+            </div>
+
+            <div class="line">
+              email:
+              <a href="mailto:TON-EMAIL@exemple.com">
+                Yousouphkhasiatu@gmail.com
+              </a>
+            </div>
+
+            <div class="line">
+              github:
+              <a href="https://github.com/Yousouphkhasiatu-dev" target="_blank">
+                Mon profil GitHub
+              </a>
+            </div>
+
+            <div class="line">
+              disponibilité:
+              <span style="color:#5fd3bc;">
+                Ouverte aux opportunités et aux projets
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </div>
+
+</div>
+
+
+<footer>
+
+  © <span id="year"></span>
+  — Portfolio construit avec HTML, CSS & JavaScript
+
+</footer>
+
+
+<script>
+
+document.getElementById('year').textContent =
+new Date().getFullYear();
+
+const navItems =
+document.querySelectorAll('.nav-item');
+
+const sections =
+document.querySelectorAll('.section');
+
+
+const observer =
+new IntersectionObserver((entries) => {
+
+  entries.forEach(entry => {
+
+    if(entry.isIntersecting){
+
+      navItems.forEach(item =>
+        item.classList.remove('active')
+      );
+
+      const active =
+      document.querySelector(
+        `.nav-item[href="#${entry.target.id}"]`
+      );
+
+      if(active){
+        active.classList.add('active');
+      }
+
+    }
+
+  });
+
+}, {
+  rootMargin: '-40% 0px -50% 0px'
+});
+
+
+sections.forEach(section =>
+  observer.observe(section)
+);
+
+</script>
+
+</body>
+</html>
